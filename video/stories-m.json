@@ -1,0 +1,24 @@
+{
+ "id": "stories-m",
+ "device": "mobile",
+ "width": 780,
+ "height": 1688,
+ "seconds": 8.5,
+ "sourceFps": 34.9,
+ "renderFps": 60,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Stories row: sponsored cards"
+  },
+  {
+   "t": 2,
+   "text": "Swipe sideways: more stories"
+  },
+  {
+   "t": 5.5,
+   "text": "And back to the first"
+  }
+ ]
+}

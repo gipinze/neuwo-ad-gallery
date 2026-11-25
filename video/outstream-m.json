@@ -1,0 +1,28 @@
+{
+ "id": "outstream-m",
+ "device": "mobile",
+ "width": 780,
+ "height": 1688,
+ "seconds": 11,
+ "sourceFps": 32.5,
+ "renderFps": 60.1,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Scroll down the article"
+  },
+  {
+   "t": 4,
+   "text": "It starts playing in the article"
+  },
+  {
+   "t": 8,
+   "text": "Video keeps playing"
+  },
+  {
+   "t": 2.5,
+   "text": "The unit comes into view"
+  }
+ ]
+}

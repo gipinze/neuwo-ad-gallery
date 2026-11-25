@@ -1,0 +1,28 @@
+{
+ "id": "interscroller-video-m",
+ "device": "mobile",
+ "width": 780,
+ "height": 1688,
+ "seconds": 11,
+ "sourceFps": 43.8,
+ "renderFps": 60,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Scroll toward the unit"
+  },
+  {
+   "t": 2,
+   "text": "The creative is revealed"
+  },
+  {
+   "t": 4.5,
+   "text": "It scrolls up with the page"
+  },
+  {
+   "t": 9.5,
+   "text": "Article again"
+  }
+ ]
+}

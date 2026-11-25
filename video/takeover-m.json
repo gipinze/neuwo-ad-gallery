@@ -1,0 +1,28 @@
+{
+ "id": "takeover-m",
+ "device": "mobile",
+ "width": 780,
+ "height": 1688,
+ "seconds": 9.5,
+ "sourceFps": 31.8,
+ "renderFps": 60.1,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Full-screen takeover: one advertiser"
+  },
+  {
+   "t": 8,
+   "text": "Back to the article"
+  },
+  {
+   "t": 2.4,
+   "text": "The page is behind the creative"
+  },
+  {
+   "t": 3.6,
+   "text": "Scroll to content: the page comes up"
+  }
+ ]
+}

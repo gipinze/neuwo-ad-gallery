@@ -1,0 +1,24 @@
+{
+ "id": "contentplayer-desktop",
+ "device": "desktop",
+ "width": 1366,
+ "height": 900,
+ "seconds": 12,
+ "sourceFps": 32.8,
+ "renderFps": 60.1,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Content player in the article"
+  },
+  {
+   "t": 3,
+   "text": "Plays news clips"
+  },
+  {
+   "t": 8.6,
+   "text": "Scroll away: the player pauses"
+  }
+ ]
+}

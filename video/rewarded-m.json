@@ -1,0 +1,28 @@
+{
+ "id": "rewarded-m",
+ "device": "mobile",
+ "width": 780,
+ "height": 1688,
+ "seconds": 17,
+ "sourceFps": 10.8,
+ "renderFps": 60,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Offer: watch an ad to unlock the article"
+  },
+  {
+   "t": 3,
+   "text": "Ad playing"
+  },
+  {
+   "t": 11,
+   "text": "Reward granted"
+  },
+  {
+   "t": 13,
+   "text": "The article is unlocked"
+  }
+ ]
+}

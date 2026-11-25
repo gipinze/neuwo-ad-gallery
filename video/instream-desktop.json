@@ -1,0 +1,20 @@
+{
+ "id": "instream-desktop",
+ "device": "desktop",
+ "width": 1366,
+ "height": 900,
+ "seconds": 14,
+ "sourceFps": 27.8,
+ "renderFps": 59.8,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Pre-roll ad in the publisher player"
+  },
+  {
+   "t": 8.5,
+   "text": "Content resumes after the ad"
+  }
+ ]
+}

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<title>Ad Unit Gallery</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="artifact-thumbnail" href="thumb.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: unit list on the left, a device stage on the right; the stage plays the lab recording frame by frame */
+:root {
+  --bg: #eef2f4; --panel: #ffffff; --ink: #13232e; --muted: #5a6b77; --line: #d6dee4;
+  --accent: #0b7a75; --accent-soft: #dcefed; --live: #9a5b00; --live-soft: #fcefd6;
+  --stage: #1b2830; --stage-ink: #e6eef2; --bezel: #0c1216; --chrome: #dfe5e9; --chrome-ink: #46555f;
+  --display: "Sora", "Segoe UI", system-ui, sans-serif; --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d151a; --panel: #142028; --ink: #e3ecf0; --muted: #9aadb8; --line: #263843;
+  --accent: #4fc4bb; --accent-soft: #123532; --live: #f0b45a; --live-soft: #3a2a12;
+  --stage: #070c0f; --stage-ink: #e6eef2; --bezel: #000; --chrome: #23323b; --chrome-ink: #b5c4cd; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0d151a; --panel: #142028; --ink: #e3ecf0; --muted: #9aadb8; --line: #263843;
+  --accent: #4fc4bb; --accent-soft: #123532; --live: #f0b45a; --live-soft: #3a2a12;
+  --stage: #070c0f; --stage-ink: #e6eef2; --bezel: #000; --chrome: #23323b; --chrome-ink: #b5c4cd; color-scheme: dark }
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+button { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; padding-block: 18px 12px; max-width: 1400px; margin: 0 auto }
+.top h1 { font: 700 24px var(--display); margin: 0 }
+.top p { margin: 0; color: var(--muted); font-size: 14px; flex: 1 1 320px }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; max-width: 1400px; margin: 0 auto 12px }
+.chip { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 4px 12px; font-size: 13px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--panel) }
+.app { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px; max-width: 1400px; margin: 0 auto; padding-bottom: 40px }
+.list { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; align-self: start; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 140px); overflow-y: auto }
+.list h2 { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 12px 8px 4px }
+.item { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: center; width: 100%; text-align: left; border: 0; background: none; padding: 6px 8px; border-radius: 8px; cursor: pointer }
+.item:hover { background: var(--accent-soft) }
+.item[aria-current="true"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent) }
+.item img { width: 44px; height: 44px; object-fit: cover; object-position: center top; border-radius: 6px; border: 1px solid var(--line); background: var(--bg) }
+.item b { display: block; font-weight: 600; font-size: 14px; line-height: 1.25 }
+.item span { font-size: 12px; color: var(--muted) }
+.play-tag { font: 500 10px var(--mono); color: var(--accent) }
+.viewer { min-width: 0; display: grid; gap: 14px; align-content: start; align-self: start }
+.stage { background: var(--stage); border-radius: 14px; padding: 22px 16px; display: grid; justify-items: center; align-content: start; gap: 14px; color: var(--stage-ink) }
+.device { position: relative; max-width: 100%; min-width: 0 }
+.device.mobile { background: var(--bezel); border-radius: 38px; padding: 12px; width: min(330px, 100%) }
+.device.mobile .screen { border-radius: 26px; overflow: hidden; aspect-ratio: var(--ar) }
+.device.desktop { width: min(980px, 100%); border-radius: 10px; overflow: hidden; background: var(--chrome) }
+.device.desktop .bar { display: flex; align-items: center; gap: 6px; padding: 8px 12px; color: var(--chrome-ink); font: 12px var(--mono) }
+.device.desktop .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--chrome-ink); opacity: .45 }
+.device.desktop .bar span { margin-left: 10px; background: var(--panel); color: var(--muted); border-radius: 6px; padding: 2px 10px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.device.desktop .screen { aspect-ratio: var(--ar) }
+.screen { background: #fff; position: relative }
+.screen img, .screen video { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; background: #000 }
+.caption { min-height: 24px; font: 500 14px var(--body); text-align: center; max-width: 60ch }
+.controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; width: min(560px, 100%) }
+.controls button { background: transparent; border: 1px solid #ffffff44; border-radius: 999px; padding: 5px 14px; cursor: pointer; color: var(--stage-ink) }
+.controls button:hover { border-color: var(--stage-ink) }
+.controls input[type=range] { flex: 1 1 180px; accent-color: var(--accent) }
+.controls .count { font: 12px var(--mono); opacity: .75; font-variant-numeric: tabular-nums }
+.views { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center }
+.views button { max-width: 100%; white-space: normal; background: transparent; border: 1px solid #ffffff33; color: var(--stage-ink); border-radius: 6px; padding: 3px 10px; font-size: 12px; cursor: pointer }
+.views button[aria-pressed="true"] { background: var(--stage-ink); color: var(--stage) }
+.info { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px }
+.info h3 { font: 600 22px var(--display); margin: 0; text-wrap: balance }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.pill { font-size: 12px; padding: 2px 10px; border-radius: 999px }
+.pill.built { background: var(--accent-soft); color: var(--accent) }
+.pill.live { background: var(--live-soft); color: var(--live) }
+.patch { font: 12px var(--mono); color: var(--muted) }
+.info p { margin: 0; max-width: 70ch }
+.note { color: var(--muted); font-size: 13px }
+select.pick { display: none }
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr) }
+  .list { display: none }
+  select.pick { display: block; width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important } }
+</style>
+<header class="top">
+  <h1>Ad unit gallery</h1>
+  <p>Every Neuwo ad unit on a neutral demo news page in our lab, with demo creatives (Neuwo's own in the recordings, fictional brands in some screenshots). Press play to watch a unit behave as the reader scrolls and taps; units without a video show their screenshots.</p>
+</header>
+<div class="filters" role="group" aria-label="Filter by group" id="filters"></div>
+<div class="app">
+  <nav class="list" id="list" aria-label="Ad units"></nav>
+  <main class="viewer">
+    <label for="pick" class="note" style="display:none" id="pickLabel">Ad unit</label>
+    <select class="pick" id="pick" aria-label="Ad unit"></select>
+    <section class="stage" aria-label="Preview">
+      <div class="views" id="views" role="group" aria-label="Views"></div>
+      <div class="device" id="device"></div>
+      <div class="caption" id="caption" aria-live="polite"></div>
+      <div class="controls" id="controls">
+        <button type="button" id="prev" aria-label="Previous frame">‹</button>
+        <button type="button" id="play">Play</button>
+        <button type="button" id="next" aria-label="Next frame">›</button>
+        <input type="range" id="scrub" min="0" max="0" value="0" aria-label="Frame">
+        <button type="button" id="speed" aria-label="Playback speed">1×</button>
+        <span class="count" id="count"></span>
+      </div>
+    </section>
+    <section class="info" id="info"></section>
+  </main>
+</div>
+<script id="data" type="application/json">{"groups": [{"id": "video", "title": "Video"}, {"id": "impact", "title": "High impact"}, {"id": "native", "title": "Native and content"}, {"id": "ai", "title": "AI and interactive"}, {"id": "direct", "title": "Direct sales and revenue tools"}], "units": [{"id": "outstream-video", "name": "Outstream video", "group": "video", "patches": "base, 06, 08, 10", "status": "live", "what": "A muted video ad in the article that starts when it is on screen and closes when it ends. Live on a publisher.", "videos": [{"id": "outstream-m", "src": "video/outstream-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 32.5, "seconds": 11, "captions": [{"t": 0, "text": "Scroll down the article"}, {"t": 2.5, "text": "The unit comes into view"}, {"t": 4, "text": "It starts playing in the article"}, {"t": 8, "text": "Video keeps playing"}]}], "films": [], "pics": [{"f": "img/show-outstream-desktop.png", "cap": "Desktop", "device": "desktop"}, {"f": "img/show-outstream-m-mobile.png", "cap": "Phone", "device": "mobile"}]}, {"id": "floating-video", "name": "Floating video", "group": "video", "patches": "08", "status": "live", "what": "When the reader scrolls past the player, the video continues in a corner until it ends or is closed.", "videos": [{"id": "floatingvideo-desktop", "src": "video/floatingvideo-desktop.webm", "device": "desktop", "w": 1366, "h": 900, "fps": 40, "seconds": 9, "captions": [{"t": 0, "text": "Video playing in the article"}, {"t": 3.6, "text": "Scroll past it"}, {"t": 5.5, "text": "It floats to the corner and keeps playing"}]}], "films": [], "pics": [{"f": "img/show-floatingvideo-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "instream-in-the-publisher-s-player", "name": "Instream in the publisher's player", "group": "video", "patches": "31, 32, 53, 54", "status": "built", "what": "Pre-, mid- and post-roll ads inside the publisher's own video player (HTML5, video.js, JW Player). The highest-paid video inventory.", "videos": [{"id": "instream-desktop", "src": "video/instream-desktop.webm", "device": "desktop", "w": 1366, "h": 900, "fps": 27.8, "seconds": 14, "captions": [{"t": 0, "text": "Pre-roll ad in the publisher player"}, {"t": 8.5, "text": "Content resumes after the ad"}]}], "films": [], "pics": [{"f": "img/show-instream-desktop.png", "cap": "Pre-roll over the publisher's player", "device": "desktop"}]}, {"id": "content-player", "name": "Content player", "group": "video", "patches": "33", "status": "built", "what": "Our own player with short news clips from the publisher's playlist, with ad breaks between clips. Creates video inventory on pages without video.", "videos": [{"id": "contentplayer-desktop", "src": "video/contentplayer-desktop.webm", "device": "desktop", "w": 1366, "h": 900, "fps": 32.8, "seconds": 12, "captions": [{"t": 0, "text": "Content player in the article"}, {"t": 3, "text": "Plays news clips"}, {"t": 8.6, "text": "Scroll away: the player pauses"}]}], "films": [], "pics": [{"f": "img/show-contentplayer-desktop.png", "cap": "Desktop", "device": "desktop"}, {"f": "img/show-contentplayer-m-mobile.png", "cap": "Phone", "device": "mobile"}]}, {"id": "pause-ad-and-squeezeback", "name": "Pause ad and squeezeback", "group": "video", "patches": "42, 43", "status": "built", "what": "TV-style formats on our player: a display ad over the paused video, or the video shrinking to one side while an ad shows beside it.", "videos": [], "films": [], "pics": [{"f": "img/show-pausead-desktop.png", "cap": "Pause ad", "device": "desktop"}, {"f": "img/show-squeezeback-desktop.png", "cap": "Squeezeback", "device": "desktop"}]}, {"id": "vertical-video", "name": "Vertical video", "group": "video", "patches": "12", "status": "built", "what": "9:16 video in the article for phone-first creatives, height capped, no layout shift.", "videos": [], "films": [], "pics": [{"f": "img/show-verticalvideo-m-mobile.png", "cap": "Phone", "device": "mobile"}]}, {"id": "native-video", "name": "Native video", "group": "video", "patches": "24", "status": "built", "what": "A native card whose media is a muted video that starts at 50 % in view. Needs SSPs that send native with a video asset.", "videos": [], "films": [], "pics": [{"f": "img/show-nativevideo-desktop.png", "cap": "Desktop", "device": "desktop"}, {"f": "img/show-nativevideo-m-mobile.png", "cap": "Phone", "device": "mobile"}]}, {"id": "interstitial-on-navigation", "name": "Interstitial on navigation", "group": "video", "patches": "29", "status": "built", "what": "A video shown between two pages of the site when the reader follows an internal link. Closable.", "videos": [], "films": [], "pics": [{"f": "img/show-interstitial-m-mobile.png", "cap": "Phone", "device": "mobile"}]}, {"id": "floor-ad-and-slider", "name": "Floor ad and slider", "group": "video", "patches": "29", "status": "built", "what": "A video docked at the bottom of the phone screen, or sliding in at the side on desktop.", "videos": [{"id": "floorad-m", "src": "video/floorad-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 53.7, "seconds": 9, "captions": [{"t": 0, "text": "Floor video docked at the bottom"}, {"t": 3.5, "text": "It stays while you read"}, {"t": 7.5, "text": "The article keeps scrolling"}]}], "films": [], "pics": [{"f": "img/show-floorad-m-mobile.png", "cap": "Floor ad, phone", "device": "mobile"}, {"f": "img/show-slider-desktop.png", "cap": "Slider, desktop", "device": "desktop"}]}, {"id": "in-image", "name": "In-image", "group": "impact", "patches": "09", "status": "built", "what": "A banner or video laid over the bottom of the article's photo, with frequency caps and a close button.", "videos": [], "films": [], "pics": [{"f": "img/show-inimage-display-m-mobile.png", "cap": "Banner, phone", "device": "mobile"}, {"f": "img/show-inimage-video-desktop.png", "cap": "Video, desktop", "device": "desktop"}]}, {"id": "interscroller", "name": "Interscroller", "group": "impact", "patches": "11, 54", "status": "built", "what": "A window in the article; the creative stays pinned while the page scrolls past it.", "videos": [{"id": "interscroller-video-m", "src": "video/interscroller-video-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 43.8, "seconds": 11, "captions": [{"t": 0, "text": "Scroll toward the unit"}, {"t": 2, "text": "The creative is revealed"}, {"t": 4.5, "text": "It scrolls up with the page"}, {"t": 9.5, "text": "Article again"}]}], "films": [], "pics": [{"f": "img/show-interscroller-display-m-mobile.png", "cap": "Display", "device": "mobile"}, {"f": "img/show-interscroller-video-m-mobile.png", "cap": "Video", "device": "mobile"}]}, {"id": "midscroll-and-fullpage", "name": "Midscroll and Fullpage", "group": "impact", "patches": "36, 54", "status": "built", "what": "Full-width and full-screen versions of the interscroller, for premium high-impact campaigns.", "videos": [{"id": "midscroll-desktop", "src": "video/midscroll-desktop.webm", "device": "desktop", "w": 1366, "h": 900, "fps": 43.9, "seconds": 11, "captions": [{"t": 0, "text": "Scroll toward the window"}, {"t": 2, "text": "The creative stays centred in the window"}, {"t": 7, "text": "The window leaves the screen"}]}, {"id": "fullpage-m", "src": "video/fullpage-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 43.8, "seconds": 11, "captions": [{"t": 0, "text": "Scroll toward the full-page window"}, {"t": 2, "text": "Full-page creative while you scroll"}, {"t": 8.5, "text": "Article again"}]}], "films": [], "pics": [{"f": "img/show-midscroll-desktop.png", "cap": "Midscroll, desktop", "device": "desktop"}, {"f": "img/show-fullpage-mobile.png", "cap": "Fullpage, phone", "device": "mobile"}]}, {"id": "topscroll", "name": "Topscroll", "group": "impact", "patches": "25, 28", "status": "built", "what": "A full-screen ad above the site's header that scrolls away with a \"Scroll to content\" button. Takes no space until an ad wins.", "videos": [{"id": "topscroll-video-m", "src": "video/topscroll-video-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 33, "seconds": 9, "captions": [{"t": 0, "text": "Full-screen topscroll: one advertiser"}, {"t": 2, "text": "Video plays above the page"}, {"t": 3.8, "text": "Scroll to content: the page comes up"}, {"t": 7.8, "text": "The article continues"}]}], "films": [], "pics": [{"f": "img/show-topscroll-m-mobile.png", "cap": "Display", "device": "mobile"}, {"f": "img/show-topscroll-video-m-mobile.png", "cap": "Video", "device": "mobile"}]}, {"id": "pushdown", "name": "Pushdown", "group": "impact", "patches": "20", "status": "built", "what": "A strip that opens to the full creative when the reader presses Expand, pushing the article down.", "videos": [{"id": "pushdown-m", "src": "video/pushdown-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 22.9, "seconds": 10, "captions": [{"t": 0, "text": "A pushdown strip above the page"}, {"t": 3.3, "text": "Expand: the creative opens"}, {"t": 7, "text": "Expanded video plays"}]}], "films": [], "pics": [{"f": "img/show-pushdown-m-mobile.png", "cap": "Collapsed", "device": "mobile"}, {"f": "img/show-pushdown-m-mobile-open.png", "cap": "Expanded", "device": "mobile"}]}, {"id": "stage", "name": "Stage", "group": "impact", "patches": "18", "status": "built", "what": "A reserved box where the winning ad shows centred at its own size, with a label row. No layout shift.", "videos": [], "films": [], "pics": [{"f": "img/show-stage-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "glide", "name": "Glide", "group": "impact", "patches": "19", "status": "built", "what": "A small card docked at the bottom of the screen while the reader scrolls.", "videos": [], "films": [], "pics": [{"f": "img/show-glide-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "skin-and-fluid-skin", "name": "Skin and fluid skin", "group": "impact", "patches": "22, 44", "status": "built", "what": "Branded side gutters on wide screens, sold directly. The fluid skin anchors to the article edge and scales to the gutter.", "videos": [], "films": [], "pics": [{"f": "img/show-skin-billboard-desktop.png", "cap": "Skin", "device": "desktop"}, {"f": "img/show-fluidskin-desktop.png", "cap": "Fluid skin", "device": "desktop"}]}, {"id": "expandable-skin", "name": "Expandable skin", "group": "impact", "patches": "30, 54", "status": "built", "what": "A skin with a \"Ver el video\" button that opens a panel with the advertiser's video.", "videos": [{"id": "expandskin-desktop", "src": "video/expandskin-desktop.webm", "device": "desktop", "w": 1366, "h": 768, "fps": 17.6, "seconds": 10, "captions": [{"t": 0, "text": "Skin: the advertiser frames the page"}, {"t": 1.8, "text": "Button: Ver el video"}, {"t": 3, "text": "Click: the panel opens with the video"}, {"t": 6, "text": "Video plays in the panel"}]}], "films": [], "pics": [{"f": "img/show-expandskin-desktop-closed.png", "cap": "Closed", "device": "desktop"}, {"f": "img/show-expandskin-desktop-open.png", "cap": "Video panel open", "device": "desktop"}]}, {"id": "native-grid", "name": "Native grid", "group": "native", "patches": "21", "status": "built", "what": "A grid of native cards, one auction per card; unfilled cards are removed.", "videos": [], "films": [], "pics": [{"f": "img/show-nativegrid-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "native-widget", "name": "Native widget", "group": "native", "patches": "37", "status": "built", "what": "A recommendation-style grid below the article: the publisher's own articles mixed with native ads.", "videos": [], "films": [], "pics": [{"f": "img/show-nativewidget-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "endless-native-feed", "name": "Endless native feed", "group": "native", "patches": "38", "status": "built", "what": "The publisher's next articles mixed with native ads below the article; a new page loads when the reader reaches the end.", "videos": [], "films": [], "pics": [{"f": "img/show-infinitefeed-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "stories", "name": "Stories", "group": "native", "patches": "40, 54", "status": "built", "what": "A swipeable row of tall cards, one auction each.", "videos": [{"id": "stories-m", "src": "video/stories-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 34.9, "seconds": 8.5, "captions": [{"t": 0, "text": "Stories row: sponsored cards"}, {"t": 2, "text": "Swipe sideways: more stories"}, {"t": 5.5, "text": "And back to the first"}]}], "films": [], "pics": [{"f": "img/show-stories-desktop.png", "cap": "Desktop", "device": "desktop"}, {"f": "img/show-stories-m-mobile.png", "cap": "Phone", "device": "mobile"}]}, {"id": "social-style-native", "name": "Social-style native", "group": "native", "patches": "41", "status": "built", "what": "A native ad drawn like a sponsored social post. No fake like counts.", "videos": [], "films": [], "pics": [{"f": "img/show-socialnative-desktop.png", "cap": "Desktop", "device": "desktop"}, {"f": "img/show-socialnative-m-mobile.png", "cap": "Phone", "device": "mobile"}]}, {"id": "product-carousel", "name": "Product carousel", "group": "native", "patches": "39", "status": "built", "what": "Sponsored products ranked by the article's words, from a feed set in MUST.", "videos": [], "films": [], "pics": [{"f": "img/show-commerce-desktop.png", "cap": "Desktop", "device": "desktop"}, {"f": "img/show-commerce-m-mobile.png", "cap": "Phone", "device": "mobile"}]}, {"id": "ai-summary-card", "name": "AI summary card", "group": "ai", "patches": "13", "status": "built", "what": "A box near the top with the article's summary and key points, a Listen button and a display ad.", "videos": [], "films": [], "pics": [{"f": "img/show-summarycard-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "ai-answer-box", "name": "AI answer box", "group": "ai", "patches": "15, 34, 35", "status": "built", "what": "Questions about the article answered by AI; the opened answer carries an ad, auctioned only when the reader opens one.", "videos": [{"id": "aianswer-desktop", "src": "video/aianswer-desktop.webm", "device": "desktop", "w": 1366, "h": 900, "fps": 0.2, "seconds": 8.5, "captions": [{"t": 0, "text": "AI answer box: questions on the topic"}, {"t": 3.5, "text": "Open an answer"}, {"t": 6, "text": "The ad sits inside the answer"}]}], "films": [], "pics": [{"f": "img/show-aianswer-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "audio-player-and-ad-breaks", "name": "Audio player and ad breaks", "group": "ai", "patches": "14, 46", "status": "built", "what": "\"Listen to this article\" in an AI voice, with audio ads at paragraph boundaries and after the article.", "videos": [], "films": [], "pics": [{"f": "img/show-audio-desktop.png", "cap": "Desktop", "device": "desktop"}]}, {"id": "interactive-rich-media", "name": "Interactive rich media", "group": "ai", "patches": "45", "status": "built", "what": "Polls, quizzes and expandable creatives that need the SafeFrame API now work on our direct render path.", "videos": [], "films": [], "pics": [{"f": "img/show-richmedia-desktop.png", "cap": "Poll creative", "device": "desktop"}]}, {"id": "rewarded-offerwall", "name": "Rewarded / offerwall", "group": "direct", "patches": "48, 51, 52", "status": "built", "what": "The reader chooses to watch a short video ad to unlock content; the reward is given only when the ad completes. Live test planned.", "videos": [{"id": "rewarded-m", "src": "video/rewarded-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 10.8, "seconds": 17, "captions": [{"t": 0, "text": "Offer: watch an ad to unlock the article"}, {"t": 3, "text": "Ad playing"}, {"t": 11, "text": "Reward granted"}, {"t": 13, "text": "The article is unlocked"}]}], "films": [], "pics": [{"f": "img/show-rewarded-offer.png", "cap": "The offer", "device": "desktop"}, {"f": "img/show-rewarded-ad.png", "cap": "The ad", "device": "desktop"}, {"f": "img/show-rewarded-unlocked.png", "cap": "Unlocked", "device": "desktop"}, {"f": "img/show-rewarded-m-offer.png", "cap": "Offer, phone", "device": "mobile"}]}, {"id": "roadblock", "name": "Roadblock", "group": "direct", "patches": "49, 50", "status": "built", "what": "One advertiser we sell directly takes every slot of a page view, all or nothing, with normal auctions as fallback.", "videos": [], "films": [], "pics": [{"f": "img/show-roadblock-desktop-728.png", "cap": "728x90", "device": "desktop"}, {"f": "img/show-roadblock-desktop-300x600.png", "cap": "300x600", "device": "desktop"}]}, {"id": "mobile-page-takeover", "name": "Mobile Page Takeover", "group": "direct", "patches": "57", "status": "built", "what": "One advertiser we sell directly takes the full-screen topscroll and every other slot of a phone page view, all or nothing, with normal auctions as fallback.", "videos": [{"id": "takeover-m", "src": "video/takeover-m.webm", "device": "mobile", "w": 780, "h": 1688, "fps": 31.8, "seconds": 9.5, "captions": [{"t": 0, "text": "Full-screen takeover: one advertiser"}, {"t": 2.4, "text": "The page is behind the creative"}, {"t": 3.6, "text": "Scroll to content: the page comes up"}, {"t": 8, "text": "Back to the article"}]}], "films": [], "pics": [{"f": "img/show-takeover-m-mobile.png", "cap": "The topscroll", "device": "mobile"}, {"f": "img/show-takeover-m-mobile-after-scroll.png", "cap": "Further down", "device": "mobile"}]}, {"id": "directly-sold-native", "name": "Directly sold native", "group": "direct", "patches": "47, 50", "status": "built", "what": "Native campaigns we sell ourselves, drawn in our native layouts with the same safety checks as programmatic native.", "videos": [], "films": [], "pics": [{"f": "img/show-directnative-desktop.png", "cap": "Card", "device": "desktop"}, {"f": "img/show-directnative-social-desktop.png", "cap": "Social layout", "device": "desktop"}]}]}</script>
+<script>
+(function () {
+  var D = JSON.parse(document.getElementById("data").textContent);
+  var byId = {}; D.units.forEach(function (u) { byId[u.id] = u; });
+  var state = { group: "all", unit: null, view: 0, frame: 0, playing: false, timer: 0, speed: 1 };
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function thumb(u) {
+    if (u.films.length) { var f = u.films[0].frames; return f[Math.min(f.length - 1, Math.floor(f.length / 3))].f; }
+    if ((u.videos || []).length && u.pics.length) return u.pics[0].f;
+    return u.pics.length ? u.pics[0].f : "";
+  }
+  function views(u) {
+    var v = [];
+    (u.videos || []).forEach(function (f) { v.push({ kind: "video", label: (f.device === "mobile" ? "Phone" : "Desktop") + " video", video: f, device: f.device, w: f.w, h: f.h }); });
+    u.films.forEach(function (f) { v.push({ kind: "film", label: (f.device === "mobile" ? "Phone" : "Desktop") + " recording", film: f, device: f.device, w: f.w, h: f.h }); });
+    u.pics.forEach(function (p) { v.push({ kind: "pic", label: p.cap, pic: p, device: p.device }); });
+    return v;
+  }
+  function renderFilters() {
+    var html = '<button type="button" class="chip" data-g="all" aria-pressed="' + (state.group === "all") + '">All</button>';
+    D.groups.forEach(function (g) { html += '<button type="button" class="chip" data-g="' + g.id + '" aria-pressed="' + (state.group === g.id) + '">' + esc(g.title) + '</button>'; });
+    html += '<button type="button" class="chip" data-g="films" aria-pressed="' + (state.group === "films") + '">With recording</button>';
+    $("filters").innerHTML = html;
+  }
+  function visible(u) { return state.group === "all" || (state.group === "films" ? (u.films.length > 0 || (u.videos || []).length > 0) : u.group === state.group); }
+  function renderList() {
+    var html = "", opts = "";
+    D.groups.forEach(function (g) {
+      var us = D.units.filter(function (u) { return u.group === g.id && visible(u); });
+      if (!us.length) return;
+      html += "<h2>" + esc(g.title) + "</h2>";
+      us.forEach(function (u) {
+        html += '<button type="button" class="item" data-u="' + u.id + '" aria-current="' + (state.unit && state.unit.id === u.id) + '"><img src="' + esc(thumb(u)) + '" alt="" loading="lazy"><div><b>' + esc(u.name) + "</b><span>" + ((u.films.length || (u.videos || []).length) ? '<span class="play-tag">▶ ' + ((u.videos || []).length ? "video" : "recording") + "</span> · " : "") + "patch " + esc(u.patches) + "</span></div></button>";
+        opts += '<option value="' + u.id + '"' + (state.unit && state.unit.id === u.id ? " selected" : "") + ">" + esc(g.title + " · " + u.name) + "</option>";
+      });
+    });
+    $("list").innerHTML = html; $("pick").innerHTML = opts;
+  }
+  function stop() { state.playing = false; clearTimeout(state.timer); $("play").textContent = "Play"; var vv = $("screenVid"); if (vv && !vv.paused) vv.pause(); }
+  function vcap(v, t) { var c = ""; (v.video.captions || []).forEach(function (x) { if (x.t <= t + 0.05) c = x.text; }); return c; }
+  function current() { return views(state.unit)[state.view]; }
+  function captionAt(fr, i) { for (var k = i; k >= 0; k--) { if (fr[k].cap) return fr[k].cap; } return ""; }
+  function showFrame() {
+    var v = current();
+    if (v.kind === "film") {
+      var fr = v.film.frames, i = state.frame;
+      $("screenImg").src = fr[i].f; $("screenImg").alt = state.unit.name + ", frame " + (i + 1);
+      $("scrub").value = i; $("count").textContent = (i + 1) + " / " + fr.length;
+      $("caption").textContent = captionAt(fr, i);
+      [fr[i + 1], fr[i + 2]].forEach(function (n) { if (n) { var im = new Image(); im.src = n.f; } });
+    }
+  }
+  function tick() {
+    var fr = current().film.frames;
+    if (state.frame >= fr.length - 1) { state.frame = 0; showFrame(); }
+    else { state.frame++; showFrame(); }
+    var gap = state.frame < fr.length - 1 ? (fr[state.frame + 1].ms - fr[state.frame].ms) : 1400;
+    if (!(gap > 0)) gap = 350;
+    if (fr[state.frame].cap) gap = Math.max(gap, 900);
+    state.timer = setTimeout(tick, gap / state.speed);
+  }
+  function renderStage() {
+    stop();
+    var v = current(), dev = v.device, ar = v.kind === "film" ? (v.w + " / " + v.h) : "auto";
+    if (v.kind === "video") ar = v.w + " / " + v.h;
+    var screen = v.kind === "video"
+      ? '<div class="screen" style="--ar:' + ar + '"><video id="screenVid" muted playsinline preload="auto" src="' + esc(v.video.src) + '"></video></div>'
+      : '<div class="screen" style="--ar:' + ar + '"><img id="screenImg" alt=""></div>';
+    $("device").className = "device " + dev;
+    $("device").innerHTML = dev === "desktop" ? '<div class="bar"><i></i><i></i><i></i><span>Neuwo Demo News · demo site in the Neuwo lab</span></div>' + screen : screen;
+    var vs = views(state.unit), html = "";
+    if (vs.length > 1) vs.forEach(function (x, k) { html += '<button type="button" data-v="' + k + '" aria-pressed="' + (k === state.view) + '">' + esc(x.label) + "</button>"; });
+    $("views").innerHTML = html;
+    var isFilm = v.kind === "film";
+    $("controls").hidden = !(isFilm || v.kind === "video");
+    if (v.kind === "video") {
+      var vid = $("screenVid"); vid.parentNode.style.aspectRatio = v.w + " / " + v.h; vid.playbackRate = state.speed;
+      $("scrub").max = 1000; $("scrub").value = 0; $("caption").textContent = vcap(v, 0); $("count").textContent = "0.0 s";
+      var DUR = function () { return isFinite(vid.duration) && vid.duration > 0 ? vid.duration : (v.video.seconds || 1); };
+      vid.addEventListener("timeupdate", function () { $("scrub").value = Math.round(1000 * Math.min(1, vid.currentTime / DUR())); $("count").textContent = vid.currentTime.toFixed(1) + " s"; $("caption").textContent = vcap(v, vid.currentTime); });
+      vid.addEventListener("ended", function () { state.playing = false; $("play").textContent = "Play"; });
+      return;
+    }
+    if (isFilm) {
+      $("screenImg").parentNode.style.aspectRatio = v.w + " / " + v.h;
+      $("screenImg").style.height = "";
+      $("scrub").max = v.film.frames.length - 1; state.frame = 0; showFrame();
+    } else {
+      $("screenImg").parentNode.style.aspectRatio = "auto";
+      $("screenImg").style.height = "auto"; $("screenImg").src = v.pic.f; $("screenImg").alt = v.pic.cap;
+      $("caption").textContent = v.pic.cap;
+    }
+  }
+  function renderInfo() {
+    var u = state.unit, g = D.groups.filter(function (x) { return x.id === u.group; })[0];
+    $("info").innerHTML = '<div class="meta"><span class="pill ' + (u.status === "live" ? "live" : "built") + '">' + (u.status === "live" ? "Live" : "Built, lab-proven") + '</span><span class="patch">patch ' + esc(u.patches) + "</span><span class=\"patch\">" + esc(g ? g.title : "") + "</span></div><h3>" + esc(u.name) + "</h3><p>" + esc(u.what) + '</p><p class="note">' + ((u.videos || []).length ? "Recorded in the lab at 60 fps. The ads are Neuwo demo creatives that name the unit. " : u.films.length ? "Recorded in the lab, played back frame by frame. " : "Screenshots use demo ads for fictional brands. ") + "Real campaigns come from the SSPs. New formats go live only with the publisher's agreement.</p>";
+  }
+  function select(id, keepHash) {
+    var u = byId[id] || D.units[0];
+    state.unit = u; state.view = 0;
+    renderList(); renderStage(); renderInfo();
+    if (!keepHash) { try { history.replaceState(null, "", "#" + u.id); } catch (e) { location.hash = u.id; } }
+  }
+  $("filters").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-g]"); if (!b) return;
+    state.group = b.getAttribute("data-g"); renderFilters(); renderList();
+    var first = D.units.filter(visible)[0]; if (first && !visible(state.unit)) select(first.id);
+  });
+  $("list").addEventListener("click", function (e) { var b = e.target.closest("[data-u]"); if (b) select(b.getAttribute("data-u")); });
+  $("pick").addEventListener("change", function () { select(this.value); });
+  $("views").addEventListener("click", function (e) { var b = e.target.closest("[data-v]"); if (!b) return; state.view = +b.getAttribute("data-v"); renderStage(); });
+  $("play").addEventListener("click", function () {
+    var vv = $("screenVid");
+    if (vv) { if (vv.paused) { if (vv.ended) vv.currentTime = 0; vv.playbackRate = state.speed; vv.play(); state.playing = true; $("play").textContent = "Pause"; } else { vv.pause(); state.playing = false; $("play").textContent = "Play"; } return; }
+    if (state.playing) { stop(); return; }
+    state.playing = true; $("play").textContent = "Pause"; state.timer = setTimeout(tick, 200 / state.speed);
+  });
+  $("prev").addEventListener("click", function () { var vv = $("screenVid"); if (vv) { vv.pause(); vv.currentTime = Math.max(0, vv.currentTime - 0.5); return; } stop(); var n = current().film.frames.length; state.frame = (state.frame - 1 + n) % n; showFrame(); });
+  $("next").addEventListener("click", function () { var vv = $("screenVid"); if (vv) { vv.pause(); vv.currentTime = Math.min(isFinite(vv.duration) ? vv.duration : (current().video.seconds || 0), vv.currentTime + 0.5); return; } stop(); var n = current().film.frames.length; state.frame = (state.frame + 1) % n; showFrame(); });
+  $("scrub").addEventListener("input", function () { var vv = $("screenVid"); if (vv) { var d = isFinite(vv.duration) && vv.duration > 0 ? vv.duration : (current().video.seconds || 1); vv.currentTime = d * this.value / 1000; return; } stop(); state.frame = +this.value; showFrame(); });
+  $("speed").addEventListener("click", function () { state.speed = state.speed === 1 ? 0.5 : state.speed === 0.5 ? 2 : 1; this.textContent = (state.speed === 0.5 ? "½" : state.speed) + "×"; var vv = $("screenVid"); if (vv) vv.playbackRate = state.speed; });
+  document.addEventListener("keydown", function (e) {
+    if (e.target.closest("input, select")) return;
+    if (current().kind !== "film" && current().kind !== "video") return;
+    if (e.key === " ") { e.preventDefault(); $("play").click(); }
+    if (e.key === "ArrowRight") $("next").click();
+    if (e.key === "ArrowLeft") $("prev").click();
+  });
+  window.addEventListener("hashchange", function () { var id = location.hash.slice(1); if (byId[id] && (!state.unit || state.unit.id !== id)) select(id, true); });
+  renderFilters();
+  var start = location.hash.slice(1);
+  var firstFilm = D.units.filter(function (u) { return (u.videos || []).length || u.films.length; })[0];
+  select(byId[start] ? start : (firstFilm || D.units[0]).id, !!byId[start]);
+})();
+</script>
+</html>

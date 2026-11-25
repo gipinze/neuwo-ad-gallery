@@ -1,0 +1,24 @@
+{
+ "id": "aianswer-desktop",
+ "device": "desktop",
+ "width": 1366,
+ "height": 900,
+ "seconds": 8.5,
+ "sourceFps": 0.2,
+ "renderFps": 60.1,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "AI answer box: questions on the topic"
+  },
+  {
+   "t": 3.5,
+   "text": "Open an answer"
+  },
+  {
+   "t": 6,
+   "text": "The ad sits inside the answer"
+  }
+ ]
+}

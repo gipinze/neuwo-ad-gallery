@@ -1,0 +1,24 @@
+{
+ "id": "floorad-m",
+ "device": "mobile",
+ "width": 780,
+ "height": 1688,
+ "seconds": 9,
+ "sourceFps": 53.7,
+ "renderFps": 60.1,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Floor video docked at the bottom"
+  },
+  {
+   "t": 3.5,
+   "text": "It stays while you read"
+  },
+  {
+   "t": 7.5,
+   "text": "The article keeps scrolling"
+  }
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "id": "topscroll-video-m",
+ "device": "mobile",
+ "width": 780,
+ "height": 1688,
+ "seconds": 9,
+ "sourceFps": 33,
+ "renderFps": 60.1,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Full-screen topscroll: one advertiser"
+  },
+  {
+   "t": 2,
+   "text": "Video plays above the page"
+  },
+  {
+   "t": 3.8,
+   "text": "Scroll to content: the page comes up"
+  },
+  {
+   "t": 7.8,
+   "text": "The article continues"
+  }
+ ]
+}

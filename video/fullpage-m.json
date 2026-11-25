@@ -1,0 +1,24 @@
+{
+ "id": "fullpage-m",
+ "device": "mobile",
+ "width": 780,
+ "height": 1688,
+ "seconds": 11,
+ "sourceFps": 43.8,
+ "renderFps": 60.1,
+ "codec": "video/webm;codecs=vp9",
+ "captions": [
+  {
+   "t": 0,
+   "text": "Scroll toward the full-page window"
+  },
+  {
+   "t": 2,
+   "text": "Full-page creative while you scroll"
+  },
+  {
+   "t": 8.5,
+   "text": "Article again"
+  }
+ ]
+}
